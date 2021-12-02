@@ -22,19 +22,19 @@ and its nutritional informatio.
 		etc.
 		- ingredients:{
 			- ingredient:
-			- weight:
-			- kcal:
-			- ch:
-			- protein:
-			- fat:
-			- sugar:
-			- fiber:
-			etc.
-				- ingredient: 
-					(...)
+				- weight:
+				- kcal:
+				- ch:
+				- protein:
+				- fat:
+				- sugar:
+				- fiber:
+				etc.
+			- ingredient: 
+			(...)
 		},
 	- recipe:
-		(...)
+	(...)
 ]
 ```
 
