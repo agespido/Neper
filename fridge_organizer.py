@@ -8,6 +8,7 @@ import pandas as pd
 begin = 'Fecha'
 end = 'Total'
 dateFormat = r"(.*\D),(.*\D) (.\d),(.*\d)"
+qtyFormat = r"(.\d*)"
 meals = ['Desayuno', 'Almuerzo', 'Cena', 'Pasa Bocas / Otros']
 
 def getRecipe():
@@ -37,8 +38,22 @@ def csv2dict(fileName):
 		if not add2table:
 			continue
 
-		if not re.match(dateFormat, row[0]):
-			cprint(row[0], 'red')
+#		if not re.match(dateFormat, row[0]) and not any(s in row[0] for s in meals):
+#			cprint(row[0], 'red')
+		if re.match(dateFormat, row[0]):
+			cprint( 'DATE: '+ str(row[0]), 'red')
+
+		elif any(s in row[0] for s in meals):
+			cprint('MEAL' + str(row[0]), 'yellow')
+
+		elif row[0].strip()[0].isdigit():
+			cprint(row[0], 'blue')
+
+		else:
+			cprint(row[0], 'green')
+
+
+
 		row.append('')
 		table.append(row)
 
