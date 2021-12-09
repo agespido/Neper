@@ -4,7 +4,7 @@ import json
 import re
 from termcolor import cprint
 import pandas as pd
-from modules.receipt_classes import Ingredient, Recipe
+from modules.recipe_classes import Ingredient, Recipe
 import array
 
 begin = 'Fecha'
@@ -21,8 +21,8 @@ def getIngeredients():
 	pass
 
 
-def write2json(data: array):
-	with open("Dataset.json", 'w') as file:
+def write2json(filename: str, data: array):
+	with open(filename, 'w') as file:
 		for rec in data:
 			serialized = rec.tojson
 			json.dump(serialized, file)
@@ -31,10 +31,9 @@ def write2json(data: array):
 def csv2dict(fileName) -> array:
 	table = []
 	rdr = csv.reader(open(fileName, newline=''), delimiter=',', quotechar='"')
-	dict = csv.DictReader(fileName, delimiter=',')
 	add2table = False
 	hdr = []
-	recipies = []
+	recipes = []
 	rec = None
 	ing = None
 	for row in rdr:
@@ -60,21 +59,18 @@ def csv2dict(fileName) -> array:
 		elif any(s in row[0] for s in meals):
 			cprint('MEAL' + str(row[0]), 'yellow')
 			if rec is not None:
-				recipies.append(rec)
-			rec = Recipe()
-			rec.type = str(row[0])
-			rec.ingredients = []
+				recipes.append(rec)
+			rec = Recipe('', str(row[0]), [])
 			if row[1] not in (None, ''):
 				rec.kcal = float(row[1])
 
 		elif row[0].strip()[0].isdigit():
 			cprint(row[0], 'blue')
-			ing.quantity = row[0]
-			rec.ingredients.append(ing)
+			ing.add_quantity(row[0])
+			rec.add_ingredient(ing)
 		else:
 			cprint(row[0], 'green')
-			ing = Ingredient()
-			ing.name = row[0]
+			ing = Ingredient(row[0])
 
 
 
@@ -84,16 +80,16 @@ def csv2dict(fileName) -> array:
 	df = pd.DataFrame(table, columns=hdr)
 	print(df)
 	df.to_json(r'exported_data.json')
-	return recipies
+	return recipes
 
 
 def main():
 	cprint('>> Running fridge organizer', 'green', attrs=['bold'])
 	datafiles = glob.glob('data/raw/*.csv')
-	recipies = []
+	recipes = []
 	for f in datafiles:
-		recipies += csv2dict(f)
-	write2json(recipies)
+		recipes += csv2dict(f)
+	write2json('.recipes.json', recipes)
 	print("Finished!")
 
 
