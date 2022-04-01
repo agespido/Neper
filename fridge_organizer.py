@@ -23,9 +23,12 @@ def getIngeredients():
 
 def write2json(filename: str, data: array):
 	with open(filename, 'w') as file:
+		serialized = '['
 		for rec in data:
-			serialized = rec.tojson
-			json.dump(serialized, file)
+			serialized += rec.tojson
+			serialized += ','
+		serialized = serialized[:-1] + ']'
+		file.writelines(serialized)
 
 
 def csv2dict(fileName) -> array:
@@ -50,36 +53,29 @@ def csv2dict(fileName) -> array:
 		if not add2table:
 			continue
 
-#		if not re.match(dateFormat, row[0]) and not any(s in row[0] for s in meals):
-#			cprint(row[0], 'red')
-
 		if re.match(dateFormat, row[0]):
 			cprint( 'DATE: '+ str(row[0]), 'red')
 
 		elif any(s in row[0] for s in meals):
 			cprint('MEAL' + str(row[0]), 'yellow')
-			if rec is not None:
+			if rec is not None and rec.kcal > 0:
 				recipes.append(rec)
-			rec = Recipe('', str(row[0]), [])
+			rec = Recipe('', str(row[0].lstrip()), [])
 			if row[1] not in (None, ''):
 				rec.kcal = float(row[1])
 
+
 		elif row[0].strip()[0].isdigit():
 			cprint(row[0], 'blue')
-			ing.add_quantity(row[0])
+			ing.add_quantity(row[0].lstrip())
 			rec.add_ingredient(ing)
 		else:
 			cprint(row[0], 'green')
-			ing = Ingredient(row[0])
-
-
+			ing = Ingredient(row[0].lstrip())
 
 		row.append('')
 		table.append(row)
 
-	df = pd.DataFrame(table, columns=hdr)
-	print(df)
-	df.to_json(r'exported_data.json')
 	return recipes
 
 
@@ -90,7 +86,7 @@ def main():
 	for f in datafiles:
 		recipes += csv2dict(f)
 	write2json('.recipes.json', recipes)
-	print("Finished!")
+	cprint('>> Finished!', 'green')
 
 
 if __name__ == '__main__':

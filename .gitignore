@@ -3,3 +3,5 @@ data/.DS_Store
 exported_data.json
 .idea
 *.json
+__pycache__
+data/raw/*
